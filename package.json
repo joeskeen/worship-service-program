@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "publish:gh-pages": "bash scripts/publish-gh-pages.sh",
+    "publish:gh-pages:dry-run": "bash scripts/publish-gh-pages.sh --dry-run"
   },
   "prettier": {
     "printWidth": 100,
