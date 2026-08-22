@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { FormField, FormRoot, form } from '@angular/forms/signals';
 import { ProgramService } from '../services/program.service';
 import { EditorSection } from './editor-section';
@@ -156,19 +156,32 @@ export class CoverEditor {
   protected readonly coverForm = form(this.programService.model);
   protected readonly options = COVER_IMAGE_OPTIONS;
 
-  /** The current URL in the model, mapped to whichever option matches (or '__custom__' / ''). */
+  /** The current URL in the model, mapped to whichever option matches.
+   *  Returns '' for "(No image)", '__custom__' when the URL doesn't match
+   *  any curated option, and the option URL otherwise. */
   protected readonly currentSelection = computed(() => {
     const url = this.programService.model().cover.coverImage;
     if (!url) return '';
-    if (COVER_IMAGE_OPTIONS.some((o) => o.url === url && o.url !== '__custom__')) return url;
-    return '__custom__';
+    const curatedMatch = COVER_IMAGE_OPTIONS.find((o) => o.url === url && o.url !== '__custom__');
+    return curatedMatch ? curatedMatch.url : '__custom__';
   });
 
-  protected readonly showCustom = computed(() => this.currentSelection() === '__custom__');
+  /** Transient UI state: true when the dropdown is set to "Custom URL…". */
+  protected readonly showCustom = signal(false);
+
+  /** Effect to keep showCustom in sync with the model when it changes from
+   *  external sources (e.g. JSON import sets a non-curated URL). */
+  constructor() {
+    effect(() => {
+      const sel = this.currentSelection();
+      this.showCustom.set(sel === '__custom__');
+    });
+  }
 
   onCoverSelect(value: string): void {
+    this.showCustom.set(value === '__custom__');
     if (value === '__custom__') {
-      // Don't clear the model; just leave it as-is so the URL field shows the current value.
+      // Don't write to the model yet — wait for the user to type into the URL input.
       return;
     }
     this.programService.model.update((p) => ({
