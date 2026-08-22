@@ -1,0 +1,91 @@
+:host {
+  display: block;
+  height: 100vh;
+  --cream:      #faf7f2;
+  --parchment:  #f0ebe0;
+  --gold:       #8b6914;
+  --brown:      #3d2b1f;
+  --brown-mid:  #6b4c3b;
+  --rule:       #c9b99a;
+  --text:       #2a1f15;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--parchment);
+  color: var(--text);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .6rem 1.25rem;
+  background: #fff;
+  border-bottom: 1px solid var(--rule);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .04);
+  flex: 0 0 auto;
+}
+
+.brand {
+  font-family: 'Cinzel', serif;
+  font-size: 1.05rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--brown);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: .5rem;
+}
+
+button {
+  font-family: 'Cinzel', serif;
+  font-size: .8rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: .45rem .85rem;
+  border: 1px solid var(--rule);
+  background: var(--cream);
+  color: var(--brown);
+  border-radius: 3px;
+  cursor: pointer;
+  &:hover { background: #fff; border-color: var(--brown); }
+  &.primary { background: var(--gold); color: #fff; border-color: var(--gold); &:hover { background: #6f5410; } }
+  &.toggle.active { background: var(--brown); color: #fff; border-color: var(--brown); }
+  &.danger { color: #8a2a2a; &:hover { background: #fbecec; border-color: #8a2a2a; } }
+}
+
+.hidden { display: none; }
+
+.main {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(320px, 28%) 1fr;
+  min-height: 0;
+}
+
+.sidebar {
+  min-height: 0;
+  overflow: hidden;
+  background: var(--cream);
+}
+
+.preview {
+  min-height: 0;
+  overflow: auto;
+}
+
+.editor-collapsed .main { grid-template-columns: 0 1fr; }
+.editor-collapsed .sidebar { display: none; }
+
+@media (max-width: 860px) {
+  .main { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .sidebar { max-height: 50vh; }
+  .actions { flex-wrap: wrap; }
+  .brand { font-size: .9rem; }
+}

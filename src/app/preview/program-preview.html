@@ -1,0 +1,195 @@
+<div class="program-preview">
+  <div class="page">
+    <div class="columns">
+      <!-- COL 1 - COVER -->
+      <section class="col col-cover">
+        <div class="church-name-top">
+          <span>The Church of<br /></span>
+          <strong>Jesus Christ</strong><br />
+          <span>of Latter-day Saints</span>
+        </div>
+
+        <div class="ward-title">{{ program().cover.wardName }}</div>
+        <div class="date-line">{{ program().cover.date }}</div>
+
+        <div class="times-block">
+          @for (t of program().cover.times; track t.label) {
+            <div>{{ t.label }} &nbsp;{{ t.time }}</div>
+          }
+          @if (showCoverImage()) {
+            <img
+              [ngSrc]="program().cover.coverImage"
+              alt=""
+              width="400"
+              height="400"
+              priority
+              appHideOnError
+            />
+          }
+        </div>
+
+        <div class="scripture">
+          {{ program().cover.scripture }}
+          @if (program().cover.scriptureRef) {
+            <span class="scripture-ref">{{ program().cover.scriptureRef }}</span>
+          }
+        </div>
+
+        <div class="cover-ornament" aria-hidden="true">
+          <svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg">
+            <g fill="none" stroke="currentColor" stroke-width="0.8" stroke-linecap="round">
+              <path d="M60 5 L60 55" />
+              <path d="M30 30 L90 30" />
+              <path d="M35 30 Q60 10 85 30" />
+              <path d="M35 30 Q60 50 85 30" />
+              <circle cx="60" cy="30" r="3" fill="currentColor" stroke="none" />
+              <circle cx="30" cy="30" r="2" fill="currentColor" stroke="none" />
+              <circle cx="90" cy="30" r="2" fill="currentColor" stroke="none" />
+              <circle cx="60" cy="5" r="1.5" fill="currentColor" stroke="none" />
+              <circle cx="60" cy="55" r="1.5" fill="currentColor" stroke="none" />
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- COL 2 - ORDER OF SERVICE -->
+      <section class="col col-program">
+        <div class="section-heading">Order of Service</div>
+
+        <div class="presiding-grid">
+          <span class="presiding-label">Presiding</span>
+          <span class="presiding-value">{{ program().leadership.presiding }}</span>
+          <span class="presiding-label">Conducting</span>
+          <span class="presiding-value">{{ program().leadership.conducting }}</span>
+          <span class="presiding-label">Organist</span>
+          <span class="presiding-value">{{ program().leadership.organist }}</span>
+          <span class="presiding-label">Chorister</span>
+          <span class="presiding-value">{{ program().leadership.chorister }}</span>
+        </div>
+
+        <div class="ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+
+        @for (item of program().orderOfService; track $index) {
+          <div class="hymn-block">
+            @if (isHymnOrMusical(item)) {
+              @if (item.label) {
+                <div class="hymn-label">{{ item.label }}</div>
+              }
+              @if (item.number) {
+                <div class="hymn-number">{{ item.number }}</div>
+              }
+              @if (item.title) {
+                <div class="hymn-title">"{{ item.title }}"</div>
+              }
+              @if (item.note) {
+                <div class="hymn-note">{{ item.note }}</div>
+              }
+            } @else if (isPrayer(item)) {
+              <div class="service-item">{{ item.label }}</div>
+              @if (item.note) {
+                <div class="directed">{{ item.note }}</div>
+              }
+            } @else if (isSpeaker(item)) {
+              @for (row of speakers(item); track row.name) {
+                <div class="speaker-row"><span>{{ row.label }}</span><span>{{ row.name }}</span></div>
+              }
+            } @else if (isTitleItem(item)) {
+              <div class="service-item">{{ item.title }}</div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- COL 3 - CALENDAR -->
+      <section class="col col-calendar">
+        <div class="section-heading">Calendar of Events</div>
+
+        @for (event of program().calendar; track $index) {
+          <div class="event">
+            @if (event.date || event.time) {
+              <div class="event-date">
+                {{ event.date }}
+                @if (event.date && event.time) {
+                  &nbsp;·&nbsp;
+                }
+                {{ event.time }}
+              </div>
+            }
+            <div class="event-title" [class.bold]="event.bold">{{ event.title }}</div>
+            @if (event.description) {
+              <div class="event-description">{{ event.description }}</div>
+            }
+          </div>
+        }
+
+        @for (block of program().infoBlocks; track $index) {
+          <div class="info-block">
+            <strong>{{ block.title }}</strong>
+            @if (block.body) {
+              <p>{{ block.body }}</p>
+            }
+            @if (block.bullets.length) {
+              <ul>
+                @for (b of block.bullets; track $index) {
+                  <li>{{ b }}</li>
+                }
+              </ul>
+            }
+          </div>
+        }
+
+        @for (item of program().orderOfService; track $index) {
+          @if (hasLyrics(item)) {
+            <div class="lyrics-block">
+              <span class="lyrics-title">{{ item.title }}</span>
+              <div>{{ item.lyrics }}</div>
+            </div>
+          }
+        }
+      </section>
+
+      <!-- COL 4 - ANNOUNCEMENTS -->
+      <section class="col col-announcements">
+        <div class="section-title">Announcements</div>
+
+        @for (ann of program().announcements; track $index) {
+          <div class="announce-block">
+            @if (ann.title) {
+              <strong>{{ ann.title }}</strong>
+            }
+            {{ ann.body }}
+            @if (ann.link && ann.linkLabel) {
+              <a [href]="ann.link">{{ ann.linkLabel }}</a>
+            }
+          </div>
+        }
+
+        @if (program().externalEventsUrl) {
+          <div class="new-events-note">{{ program().externalEventsNote }}</div>
+          <a class="new-events-link" [href]="program().externalEventsUrl">{{ program().externalEventsUrl }}</a>
+        }
+
+        @if (program().contacts.length) {
+          <div class="section-title">Ward Leadership &amp; Contact Info</div>
+          <div class="contact-list">
+            @for (c of program().contacts; track $index) {
+              @if (c.role || c.name || c.phone || c.email) {
+                <div class="contact-row">
+                  <span class="contact-role">{{ c.role }}</span>
+                  <span class="contact-name">{{ c.name }}</span>
+                  <span class="contact-phone">
+                    @if (c.phone) {
+                      <a [href]="'tel:' + c.phone">{{ c.phone }}</a>
+                    } @else if (c.email) {
+                      <a [href]="'mailto:' + c.email">{{ c.email }}</a>
+                    }
+                  </span>
+                </div>
+              }
+            }
+          </div>
+        }
+      </section>
+    </div>
+  </div>
+</div>
