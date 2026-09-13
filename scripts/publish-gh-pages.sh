@@ -87,6 +87,22 @@ fi
 git add .
 git commit --quiet -m "$COMMIT_MESSAGE"
 
+# Pretty-print every file that will be (or was) published.
+print_tree() {
+  local total=0
+  echo "→ Files to be published:"
+  while IFS= read -r -d '' file; do
+    local size
+    size=$(stat -c %s "$file")
+    total=$((total + size))
+    printf '   %8d  %s\n' "$size" "${file#./}"
+  done < <(find . -type f -not -path './.git/*' -print0 | sort -z)
+  printf '   --------\n   %8d  total bytes (%d files)\n' "$total" \
+    "$(find . -type f -not -path './.git/*' | wc -l)"
+}
+
+print_tree
+
 if $DRY_RUN; then
   echo "✓ Dry run complete. Skipping push."
   git log --oneline
